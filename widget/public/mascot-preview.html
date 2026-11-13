@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Mizan mascot preview</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #fbf8f1; }
+    .grid { display: grid; grid-template-columns: repeat(4, 220px); gap: 14px; padding: 16px; }
+    figure { margin: 0; background: linear-gradient(180deg, #e8f1ea, #fbf8f1); border-radius: 16px; border: 1px solid #e7e0d0; }
+    figcaption { text-align: center; font-size: 13px; padding: 4px 0 8px; color: #15211b; }
+    .a { width: 220px; height: 220px; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie_light.min.js"></script>
+</head>
+<body>
+  <div class="grid" id="grid"></div>
+  <script>
+    // ?f=1 freezes every state at a chosen frame offset (for screenshots)
+    const q = new URLSearchParams(location.search);
+    const freeze = q.has('f') ? Number(q.get('f')) : null;
+    fetch('mizan.json?' + Date.now()).then(r => r.json()).then(data => {
+      const loops = data.markers.filter(m => !m.cm.endsWith('_in'));
+      window.anims = loops.map(m => {
+        const fig = document.createElement('figure');
+        fig.innerHTML = `<div class="a"></div><figcaption>${m.cm}</figcaption>`;
+        grid.appendChild(fig);
+        const a = lottie.loadAnimation({ container: fig.firstChild, renderer: 'svg', loop: true, autoplay: false, animationData: structuredClone(data) });
+        a.addEventListener('DOMLoaded', () => {
+          if (freeze !== null) a.goToAndStop(m.tm + Math.min(freeze, m.dr - 1), true);
+          else a.playSegments([m.tm, m.tm + m.dr - 1], true);
+        });
+        return a;
+      });
+    });
+  </script>
+</body>
+</html>

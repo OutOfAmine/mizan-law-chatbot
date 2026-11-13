@@ -1,0 +1,14 @@
+# secrets
+.env
+# python
+.venv/
+__pycache__/
+*.pyc
+backend/pgdata/
+*.log
+# official PDFs are downloaded, not committed
+data/raw/*.pdf
+# node / angular
+node_modules/
+dist/
+.angular/

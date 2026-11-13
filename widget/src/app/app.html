@@ -1,0 +1,106 @@
+@if (isOpen()) {
+  <section class="panel" [class.inline]="mode() === 'inline'" [class.closing]="phase() === 'closing'"
+           [attr.data-state]="state()" dir="rtl" role="dialog" aria-label="ميزان، مساعد القانون المغربي">
+
+    <header class="head">
+      <div class="title">
+        <h2>ميزان</h2>
+        <p class="status" aria-live="polite">{{ stateLabel() }}</p>
+      </div>
+      <!-- the character stands on the header line, head above the panel -->
+      <div #stage class="mascot" [class.waiting]="phase() !== 'open' && mode() === 'floating'" aria-hidden="true"></div>
+      <div class="tools">
+        @if (!fresh()) {
+          <button class="icon-btn" (click)="newChat()" title="محادثة جديدة" aria-label="محادثة جديدة">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+        }
+        @if (mode() === 'floating') {
+          <button class="icon-btn" (click)="toggle()" title="إغلاق" aria-label="إغلاق">
+            <svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        }
+      </div>
+    </header>
+
+    <div class="list" #list aria-live="polite">
+      @if (fresh()) {
+        <div class="intro">
+          <p class="lede">مرحباً، أنا ميزان.<br><em>أفهم القانون المغربي جيداً.</em></p>
+          <p class="sub">اسألني، وسأعطيك المادة التي أخذت منها الجواب.</p>
+          <ul class="questions">
+            @for (q of questions; track q; let i = $index) {
+              <li [style.--i]="i">
+                <button (click)="send(q)">
+                  <span>{{ q }}</span>
+                  <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      @for (m of msgs(); track $index) {
+        @if (m.role === 'user') {
+          <p class="q-line" dir="auto">{{ m.text }}</p>
+        } @else {
+          <article class="answer" [class.blocked]="m.blocked" [attr.dir]="rtl(m.text) ? 'rtl' : 'ltr'">
+            @if (m.pending) {
+              <p class="wait" dir="rtl">أبحث في النصوص الرسمية…</p>
+            } @else {
+              <p dir="auto">
+                @for (s of segments(m.text); track $index) {
+                  @switch (s.kind) {
+                    @case ('cite') {@if (note(m, s.value)) {<sup class="fn">{{ note(m, s.value) }}</sup>}}
+                    @case ('bold') {<strong>{{ s.value }}</strong>}
+                    @default {{{ s.value }}}
+                  }
+                }
+              </p>
+            }
+            @if (m.sources?.length) {
+              <ol class="notes">
+                @for (src of m.sources; track src.article; let n = $index) {
+                  <li>
+                    <a [href]="src.url" target="_blank" rel="noopener noreferrer">
+                      <span class="n">{{ n + 1 }}</span>
+                      <span class="ref" dir="ltr"><b>{{ src.article }}</b> {{ src.source }}@if (page(src.url)) {, p.{{ page(src.url) }}}</span>
+                      <svg viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                    </a>
+                    <q dir="auto">{{ src.excerpt }}</q>
+                  </li>
+                }
+              </ol>
+            }
+          </article>
+        }
+      }
+    </div>
+
+    <form class="composer" (submit)="$event.preventDefault(); send()">
+      <textarea
+        rows="1" dir="auto" placeholder="اسأل عن حق أو واجب…"
+        [value]="draft()" (input)="onType($any($event.target).value)" (keydown)="key($event)"
+        (focus)="onType(draft())" (blur)="onBlur()"
+        [attr.maxlength]="max" aria-label="سؤالك"></textarea>
+      <button class="send" type="submit" [disabled]="!draft().trim() || busy()" aria-label="إرسال">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </button>
+    </form>
+    <small class="legal">المصادر الرسمية: <span dir="ltr">adala.justice.gov.ma</span></small>
+  </section>
+}
+
+@if (mode() === 'floating') {
+  <div class="launch-wrap" [class.away]="phase() === 'open'">
+    @if (phase() === 'closed') {
+      <button class="bubble" dir="rtl" (click)="toggle()" tabindex="-1" aria-hidden="true">
+        أفهم القانون المغربي جيداً،<br><strong>تحدّث معي</strong>
+      </button>
+    }
+    <button #launchBtn class="launcher" (click)="toggle()" aria-label="أفهم القانون المغربي جيداً، تحدّث معي">
+      <div #launch class="launcher-mascot" aria-hidden="true"></div>
+    </button>
+  </div>
+}

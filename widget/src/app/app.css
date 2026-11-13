@@ -1,0 +1,208 @@
+:host {
+  --ink: #141a16;
+  --ink-2: #4a524c;
+  --mute: #8a8f86;
+  --paper: #f5f0e6;
+  --rule: #d9d1bf;
+  --green: #0d5c3d;
+  --red: #b3261e;
+  --serif: "Instrument Serif", "Amiri", Georgia, serif;
+  --sans: "Bricolage Grotesque", "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
+  --arabic: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  all: initial;
+  font-family: var(--sans);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; }
+
+/* line icons only (never the Lottie character) */
+.icon-btn svg, .questions svg, .notes svg, .send svg {
+  fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* ---------------- launcher: the character + speech bubble ---------------- */
+.launch-wrap {
+  position: fixed; right: 14px; bottom: 10px; z-index: 2147483001;
+  display: flex; align-items: center; gap: 2px;
+}
+.launch-wrap.away .launcher { visibility: hidden; }
+.launcher {
+  width: 120px; height: 120px; padding: 0; border: 0; cursor: pointer;
+  background: transparent; display: block; will-change: transform;
+}
+.launcher-mascot {
+  width: 100%; height: 100%; pointer-events: none;
+  transform: scale(1.35); transform-origin: 50% 92%;
+  transition: transform .25s cubic-bezier(.3,1.6,.5,1);
+}
+.launcher:hover .launcher-mascot { transform: scale(1.42); }
+.launcher:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 24px; }
+.bubble {
+  position: relative; margin-bottom: 34px; cursor: pointer;
+  font-size: 14px; line-height: 1.35; text-align: left;
+  padding: 10px 14px; border-radius: 16px 16px 4px 16px;
+  background: #fff; border: 1px solid var(--rule);
+  box-shadow: 0 14px 30px -14px rgb(20 30 25 / .35);
+  animation: bubble-in .5s cubic-bezier(.2,1.4,.4,1) .5s both;
+}
+.bubble strong { color: var(--green); font-weight: 600; }
+.bubble::after {
+  content: ""; position: absolute; right: -7px; bottom: 10px; width: 12px; height: 12px;
+  background: #fff; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  transform: rotate(-45deg);
+}
+@keyframes bubble-in { from { opacity: 0; transform: translateX(10px) scale(.9); } }
+
+/* ---------------- panel = a sheet of paper ---------------- */
+.panel {
+  position: fixed; right: 20px; bottom: 20px; z-index: 2147483000;
+  width: min(410px, calc(100vw - 24px)); height: min(660px, calc(100vh - 90px));
+  display: flex; flex-direction: column;
+  background: var(--paper); border-radius: 18px;
+  box-shadow: 0 50px 90px -30px rgb(20 26 22 / .45), 0 0 0 1px rgb(20 26 22 / .08);
+  animation: panel-in .45s cubic-bezier(.2,1,.3,1) both;
+  transform-origin: 80% 100%;
+}
+.panel.closing { animation: panel-out .45s cubic-bezier(.5,0,.75,.3) .12s both; }
+.panel.inline { position: relative; right: auto; bottom: auto; width: 100%; height: 100%; }
+@keyframes panel-in { from { opacity: 0; transform: translateY(20px); } }
+@keyframes panel-out { to { opacity: 0; transform: translateY(20px); } }
+
+/* ---------------- header: name + the character on the rule ---------------- */
+.head {
+  position: relative; flex: 0 0 auto; height: 104px; padding: 18px 22px 0;
+  border-bottom: 1px solid var(--ink);
+}
+.title h2 {
+  margin: 0; font-family: var(--serif); font-weight: 400; font-size: 46px; line-height: .9; letter-spacing: -.02em;
+}
+.status {
+  margin: 8px 0 0; font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink-2);
+  transition: color .3s;
+}
+.panel[data-state="thinking"] .status { color: #8a6412; }
+.panel[data-state="refuse"] .status, .panel[data-state="sad"] .status { color: var(--red); }
+
+/* feet on the header rule, head above the top edge of the sheet */
+.mascot {
+  position: absolute; inset-inline-end: 92px; bottom: -17px; width: 150px; height: 150px; pointer-events: none;
+}
+.mascot.waiting { visibility: hidden; }
+
+.tools { position: absolute; inset-inline-end: 14px; top: 14px; display: flex; gap: 2px; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer; background: transparent;
+  display: grid; place-items: center; color: var(--ink-2); transition: background .15s, color .15s;
+}
+.icon-btn:hover { background: rgb(20 26 22 / .06); color: var(--ink); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+/* ---------------- conversation ---------------- */
+.list { flex: 1; overflow-y: auto; padding: 22px 22px 12px; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+
+.intro { animation: rise .5s cubic-bezier(.2,1,.3,1) .15s both; }
+.lede { margin: 0; font-family: var(--serif); font-size: 31px; line-height: 1.08; letter-spacing: -.01em; }
+.lede em { color: var(--green); }
+.sub { margin: 12px 0 18px; color: var(--ink-2); font-size: 14.5px; max-width: 30ch; }
+.questions { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.questions li { border-bottom: 1px solid var(--rule); animation: rise .45s cubic-bezier(.2,1,.3,1) both; animation-delay: calc(.25s + var(--i, 0) * 70ms); }
+.questions button {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 13px 0; border: 0; background: none; cursor: pointer; text-align: left; font-size: 15px;
+}
+.questions button span { background: linear-gradient(var(--ink), var(--ink)) 0 100% / 0 1px no-repeat; transition: background-size .35s ease; padding-bottom: 1px; }
+.questions button:hover span { background-size: 100% 1px; }
+.questions svg { width: 18px; height: 18px; flex: 0 0 auto; color: var(--mute); transition: transform .25s, color .25s; }
+.questions button:hover svg { transform: translateX(4px); color: var(--green); }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+
+/* the question reads like a heading, the answer like body text */
+.q-line {
+  margin: 4px 0 10px; font-family: var(--serif); font-size: 24px; line-height: 1.12; letter-spacing: -.01em;
+  animation: rise .35s cubic-bezier(.2,1,.3,1) both;
+}
+.answer { margin: 0 0 26px; padding-inline-start: 14px; border-inline-start: 2px solid var(--green); animation: rise .35s cubic-bezier(.2,1,.3,1) both; }
+.answer.blocked { border-inline-start-color: var(--red); }
+.answer.blocked p { color: var(--red); }
+.answer p { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.fn { margin: 0 2px 0 0; }
+.answer[dir="rtl"] .notes { text-align: left; }
+.wait[dir="rtl"] { font-family: var(--arabic); font-style: normal; font-size: 15px; }
+.fn {
+  font-size: 11px; font-weight: 600; color: var(--red); line-height: 0; margin-left: 1px; vertical-align: super;
+}
+.wait {
+  font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--ink-2);
+  background: linear-gradient(90deg, var(--ink-2) 40%, #c8901a 50%, var(--ink-2) 60%) 0 0 / 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+
+/* footnotes = the sources */
+.notes { list-style: none; margin: 14px 0 0; padding: 10px 0 0; border-top: 1px solid var(--rule); }
+.notes li + li { margin-top: 10px; }
+.notes a {
+  display: flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); font-size: 13.5px;
+}
+.notes .n { color: var(--red); font-weight: 600; font-size: 12px; min-width: 10px; }
+.notes .ref { flex: 1; }
+.notes .ref b { font-weight: 600; }
+.notes a:hover .ref b { text-decoration: underline; text-underline-offset: 3px; }
+.notes svg { width: 14px; height: 14px; color: var(--mute); transition: transform .2s, color .2s; align-self: center; }
+.notes a:hover svg { transform: translate(2px, -2px); color: var(--green); }
+.notes q {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin: 4px 0 0 18px; font-family: var(--serif); font-style: italic; font-size: 14.5px; line-height: 1.3; color: var(--ink-2);
+  quotes: "« " " »";
+}
+
+/* ---------------- composer ---------------- */
+.composer {
+  display: flex; align-items: flex-end; gap: 10px; margin: 0 14px; padding: 10px 6px 10px 8px;
+  border-top: 1px solid var(--ink);
+}
+textarea {
+  flex: 1; resize: none; border: 0; outline: 0; background: transparent; font: inherit; font-size: 15.5px; color: inherit;
+  max-height: 110px; padding: 9px 0;
+}
+textarea::placeholder { color: var(--mute); }
+.send {
+  width: 42px; height: 42px; flex: 0 0 auto; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--ink); color: var(--paper); display: grid; place-items: center;
+  transition: transform .2s, background .2s, opacity .2s;
+}
+.send svg { width: 19px; height: 19px; stroke-width: 2; }
+.send:not(:disabled):hover { background: var(--green); transform: rotate(-45deg); }
+.send:disabled { opacity: .18; cursor: default; }
+.legal { display: block; padding: 2px 22px 12px; font-size: 11px; color: var(--mute); }
+
+@media (max-width: 420px) {
+  .bubble { font-size: 13px; max-width: 170px; }
+  .panel { right: 12px; bottom: 12px; }
+  .lede { font-size: 27px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---------------- Arabic / right-to-left ---------------- */
+[dir="rtl"] .title h2 { font-size: 50px; line-height: 1.05; letter-spacing: 0; font-weight: 700; }
+[dir="rtl"] .lede { font-size: 30px; line-height: 1.45; letter-spacing: 0; }
+[dir="rtl"] .lede em, [dir="rtl"] .status, [dir="rtl"] .wait, [dir="rtl"] .notes q { font-style: normal; }
+[dir="rtl"] .status { font-family: var(--sans); font-size: 14px; }
+[dir="rtl"] .questions button { font-size: 16px; text-align: right; }
+[dir="rtl"] .questions svg, [dir="rtl"] .send svg { transform: scaleX(-1); }
+[dir="rtl"] .questions button:hover svg { transform: scaleX(-1) translateX(4px); }
+[dir="rtl"] .send:not(:disabled):hover { transform: rotate(45deg); }
+[dir="rtl"] .q-line { line-height: 1.5; letter-spacing: 0; }
+[dir="rtl"] .answer p { font-size: 16px; line-height: 1.9; }
+[dir="rtl"] .wait { font-family: var(--sans); font-size: 15px; }
+[dir="rtl"] .notes .ref { text-align: left; }
+[dir="rtl"] .notes q { margin: 4px 18px 0 0; }
+.bubble[dir="rtl"] { text-align: right; font-size: 15px; line-height: 1.5; }
+[dir="rtl"] textarea:placeholder-shown { direction: rtl; }

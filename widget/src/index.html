@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Cabinet Benali — Avocats à Casablanca</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; font-family: Georgia, serif; background: #f4f1ea; color: #222; }
+    nav { display: flex; align-items: center; gap: 34px; padding: 26px 7vw; border-bottom: 1px solid #ddd5c4; font-size: 16px; }
+    nav b { font-size: 23px; margin-right: auto; letter-spacing: .01em; }
+    nav a { color: #444; text-decoration: none; }
+    nav .cta { border: 1px solid #222; padding: 9px 18px; color: #222; }
+    .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 6vw; padding: 9vh 7vw 7vh; align-items: end; }
+    h1 { font-size: 60px; line-height: 1.02; margin: 0; font-weight: 400; }
+    .hero p { font-size: 19px; color: #555; line-height: 1.6; margin: 0 0 8px; }
+    .areas { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #ddd5c4; margin: 0 7vw; }
+    .areas div { padding: 26px 26px 34px 0; }
+    .areas div + div { padding-left: 26px; border-left: 1px solid #ddd5c4; }
+    .areas h3 { font-weight: 400; font-size: 24px; margin: 0 0 8px; }
+    .areas p { color: #666; font-size: 16px; line-height: 1.55; margin: 0; }
+    footer { margin: 6vh 7vw 0; padding: 22px 0; border-top: 1px solid #ddd5c4; color: #888; font-size: 14px; }
+    /* ?solo : only the chatbot, filling the page (no website around it) */
+    html.solo body > :not(mizan-chat) { display: none; }
+    html.solo mizan-chat { position: fixed; inset: 0; display: block; }
+  </style>
+  <script>
+    if (new URLSearchParams(location.search).has('solo')) document.documentElement.classList.add('solo');
+  </script>
+</head>
+<body>
+  <nav><b>Cabinet Benali</b><a href="#">Le cabinet</a><a href="#">Domaines</a><a href="#">Honoraires</a><a class="cta" href="#">Prendre rendez-vous</a></nav>
+  <section class="hero">
+    <h1>Droit du travail et droit de la famille, à Casablanca.</h1>
+    <p>Conseil et défense des salariés, des employeurs et des familles depuis 2009. Premier rendez-vous sous 48 heures.</p>
+  </section>
+  <section class="areas">
+    <div><h3>Droit du travail</h3><p>Licenciement, congés, heures supplémentaires, indemnités.</p></div>
+    <div><h3>Droit de la famille</h3><p>Divorce, garde des enfants, pension alimentaire, succession.</p></div>
+    <div><h3>Entreprises</h3><p>Contrats de travail, règlement intérieur, contentieux.</p></div>
+  </section>
+  <footer>12 boulevard d'Anfa, Casablanca · Site exemple pour la démo</footer>
+  <mizan-chat api="http://localhost:8000" mascot="mizan.json"></mizan-chat>
+  <script>
+    if (document.documentElement.classList.contains('solo')) document.querySelector('mizan-chat').setAttribute('mode', 'inline');
+  </script>
+</body>
+</html>
